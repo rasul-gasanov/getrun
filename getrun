@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 usage()
 {
@@ -28,7 +28,7 @@ OPTIONS=u:d:c:o:
 LONGOPTIONS=username:,device-type:,config-type:,output-file:
 PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTIONS --name "$0" -- "$@")
 
-if [[ $? -ne 0 ]]; then
+if [ $? -ne 0 ]; then
     usage
     exit 1
 fi
@@ -83,8 +83,8 @@ fi
 [ "$OUTPUT_FILE" ] || OUTPUT_FILE=${DEVICE}_$(date +%Y-%m-%d_%H-%M-%S).conf
 [ "$USERNAME" ] && USERNAME="${USERNAME}@" || USERNAME=""
 
-# Cleanup on Exit and break (Ctrl-C)
-trap "cleanup ${OUTPUT_FILE}" SIGINT
+# Cleanup on exit (EXIT) and interrupt/Ctrl-C (INT)
+trap "cleanup ${OUTPUT_FILE}" INT
 trap "cleanup ${OUTPUT_FILE}" EXIT
 
 # Save configuration in output file
