@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 usage()
 {
@@ -84,8 +84,7 @@ fi
 [ "$USERNAME" ] && USERNAME="${USERNAME}@" || USERNAME=""
 
 # Cleanup on exit (EXIT) and interrupt/Ctrl-C (INT)
-trap "cleanup ${OUTPUT_FILE}" INT
-trap "cleanup ${OUTPUT_FILE}" EXIT
+trap "cleanup ${OUTPUT_FILE}" EXIT INT
 
 # Save configuration in output file
 case "$DEVICE_OS" in
