@@ -4,12 +4,13 @@ usage()
 {
     echo -e "Usage: $(basename "$0") [options] <nd>
         Positional:
-        <nd> Required. Hostname or IP-address of Network Dievice
+        <nd> Required. Hostname or IP-address of Network Device
         Options:
         (-u|--username) <username>. Username. Optional, will use name from ssh config, if not specified
-        (-d|--device-os) Device OS [ios,nxos,junos,routeros,eltex]. Optional, default: ios
-        (-c|--config-type) Config type [running,startup], only for IOS/NXOS, Optional, default: running
-        (-o|--output-file) Output file. Optional, will autogenerate name, if not specified"
+        (-d|--device-os) <device-os>. Device OS [ios,nxos,junos,routeros,eltex]. Optional, default: ios
+        (-c|--config-type) <config-type>. Config type [running,startup], only for IOS/NXOS, Optional, default: running
+        (-o|--output-file) <filename>. Output file. Optional, will autogenerate name, if not specified
+        (-r|--readonly-file) Set output file as read-only. Optional"
         1>&2
 }
 
@@ -17,15 +18,15 @@ cleanup()
 {
     if [ -f "$1" ]; then
         if [ ! -s "$1" ]; then
-            rm "$1"
+            rm -f "$1"
         else
             echo "Config saved to ${OUTPUT_FILE}"
         fi
     fi
 }
 
-OPTIONS=u:d:c:o:
-LONGOPTIONS=username:,device-type:,config-type:,output-file:
+OPTIONS=u:d:c:o:r
+LONGOPTIONS=username:,device-type:,config-type:,output-file:,readonly-file
 PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTIONS --name "$0" -- "$@")
 
 if [ $? -ne 0 ]; then
@@ -57,6 +58,10 @@ while true; do
             OUTPUT_FILE=$2
             shift 2
             ;;
+        -r|--readonly-file)
+            READONLY_FILE=TRUE
+            shift 1
+            ;;
         '--')
             # End of option args, positional parameter followed after '--' in getopt output
             shift
@@ -78,6 +83,7 @@ else
 fi
 
 # Set defaults
+[ "$READONLY_FILE" ] && umask 337
 [ "$DEVICE_OS" ] || DEVICE_OS="ios"
 [ "$CONFIG_TYPE" ] || CONFIG_TYPE="running"
 [ "$OUTPUT_FILE" ] || OUTPUT_FILE=${DEVICE}_$(date +%Y-%m-%d_%H-%M-%S).conf
